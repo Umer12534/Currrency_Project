@@ -1,51 +1,60 @@
-import React, { useId } from 'react'
+import { useId } from 'react'
 
 const InputBox = ({
-    label,
-    amount,
-    onAmountChange,
-    onCurrencyChange,
-    currencyOptions = [],
-    selectCurrency = "usd",
-    currencyDisable = false,
-    amountDisable = false,
-    }) => {
+  label,
+  amount,
+  onAmountChange,
+  onCurrencyChange,
+  currencyOptions = [],
+  selectCurrency = 'usd',
+  currencyDisable = false,
+  amountDisable = false,
+  isCurrencyLoading = false,
+}) => {
+  const amountInputId = useId()
+  const currencySelectId = useId()
 
-        const amountInputId = useId()
+  return (
+    <div className="input-box">
+      <div className="input-column">
+        <label className="field-label" htmlFor={amountInputId}>{label}</label>
+        <input
+          id={amountInputId}
+          className="amount-input"
+          type="number"
+          min="0"
+          step="any"
+          inputMode="decimal"
+          placeholder="0.00"
+          disabled={amountDisable}
+          value={amount ?? ''}
+          onChange={(event) => onAmountChange?.(Number(event.target.value))}
+        />
+      </div>
 
-    return (
-        <div className='flex bg-white p-3 rounded-b-lg text-sm'>
-            <div className="w-1/2">
-                <label htmlFor={amountInputId} className='text-black mb-2 inline-block'>
-                    {label}
-                </label>
-                <input 
-                    type="number" 
-                    className='outline-none w-full bg-transparent py-1.5'
-                    disabled = {amountDisable}
-                    value={amount}
-                    onChange={(e) => onAmountChange && onAmountChange(Number(e.target.value))}
-                />
-            </div>
-            <div className="w-1/2 flex  flex-wrap justify-end text-right">
-                <p className='mb-2 text-black'>
-                    Currency Type
-                </p>
-                <select 
-                    className='rounded-lg p-1 bg-gray-100 cursor-pointer outline-none'
-                    value={selectCurrency}
-                    onChange={(e) => onCurrencyChange && onCurrencyChange(e.target.value)}
-                    disabled = {currencyDisable}
-                >
-                    {currencyOptions.map((c) => (
-                        <option value={c} className='' key={c}>{c}</option>
-                    ))}
-
-                </select>
-            </div>
-            
+      <div className="currency-column">
+        <label className="currency-label" htmlFor={currencySelectId}>Currency</label>
+        <div className="currency-select-wrap">
+          <select
+            id={currencySelectId}
+            className="currency-select"
+            value={selectCurrency}
+            onChange={(event) => onCurrencyChange?.(event.target.value)}
+            disabled={currencyDisable || isCurrencyLoading || currencyOptions.length === 0}
+            aria-label={`${label} currency`}
+          >
+            {currencyOptions.length === 0 && <option value={selectCurrency}>{selectCurrency}</option>}
+            {currencyOptions.map((currency) => (
+              <option value={currency} key={currency}>{currency.toUpperCase()}</option>
+            ))}
+          </select>
+          <svg className="select-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="m4 6 4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </div>
-    )
+      </div>
+    </div>
+  )
 }
 
 export default InputBox
